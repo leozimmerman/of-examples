@@ -5,12 +5,11 @@ void ofApp::setup(){
     // on OSX: if you want to use ofSoundPlayer together with ofSoundStream you need to synchronize buffersizes.
     // use ofFmodSetBuffersize(bufferSize) to set the buffersize in fmodx prior to loading a file.
     
-    player.load("sounds/beat.wav");
+    player.load("sounds/mix-stereo.wav");
     
     cout<<"FILE INFO:"<<endl;
     cout<<"Duration: "<< player.getDuration()<<endl;
     cout<<"Num Channels: "<< player.getNumChannels()<<endl;
-    
     
     
     ofSetBackgroundColor(0);
@@ -19,18 +18,34 @@ void ofApp::setup(){
 //--------------------------------------------------------------
 void ofApp::update(){
     
+    int sr = player.getSampleRate();
+    
     // update the sound playing system:?
     ofSoundUpdate();
-
-    vector<float> buffer = player.getCurrentBuffer(512);
-  
+        
+    soundBuffer = player.getCurrentSoundBuffer(512);
+    
+//    cout<<"soundBuffer channels: "<<soundBuffer.getNumChannels()<<endl;
+//    cout<<"soundBuffer sr: "<<soundBuffer.getSampleRate()<<endl;
+//    cout<<"sound NumFrames"<<soundBuffer.getNumFrames()<<endl;
+//    cout<<"soundB thickCount"<<soundBuffer.getTickCount()<<endl;
+    
+    //-----------------
+    
     waveform.clear();
-    for(size_t i = 0; i < buffer.size(); i++) {
-        float sample = buffer[i];
-        float x = ofMap(i, 0, buffer.size(), 0, ofGetWidth());
+    
+    int ch=0; //channel to visualize
+    
+    for(size_t i = 0; i < soundBuffer.getNumFrames(); i++) {
+        float sample = soundBuffer.getSample(i, ch);
+        float x = ofMap(i, 0, soundBuffer.getNumFrames(), 0, ofGetWidth());
         float y = ofMap(sample, -1, 1, 0, ofGetHeight());
         waveform.addVertex(x, y);
     }
+    
+    
+    
+   
     
 }
 

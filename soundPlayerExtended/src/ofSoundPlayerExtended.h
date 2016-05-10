@@ -58,6 +58,7 @@ public:
     bool isPaused() const;
     float getDuration() const;
     int getNumChannels() const;
+    int getSampleRate() const;
     
     static void initialize();
     static void close();
@@ -69,7 +70,9 @@ public:
     vector<float>& getBufferForFrame(int _frame, float _fps, int _size);
     vector<float>& getCurrentBufferForChannel(int _size, int channel);
     vector<float> currentBuffer;
-    
+    ofSoundBuffer& getCurrentSoundBuffer(int _size);
+    ofSoundBuffer currentSoundBuffer;
+    ofSoundBuffer channelSoundBuffer;
     
     //---
     
@@ -137,5 +140,6 @@ protected:
     bool timeSet;
     float justSetTime;
 
+    
 };
 

@@ -25,4 +25,5 @@ class ofApp : public ofBaseApp{
         ofSoundPlayerExtended  player;
     
         ofPolyline waveform;
+        ofSoundBuffer soundBuffer;
 };

@@ -606,6 +606,9 @@ int ofSoundPlayerExtended::getNumChannels() const{
     return channels;
 }
 
+int ofSoundPlayerExtended::getSampleRate() const{
+    return samplerate;
+}
 //------------------------------------------------------------
 vector<short> & ofSoundPlayerExtended::getBuffer(){
     return buffer;
@@ -851,6 +854,22 @@ vector<float>& ofSoundPlayerExtended::getCurrentBuffer(int _size)
     }
     return currentBuffer;
 }
+
+//-----------------------------------------------------------
+ofSoundBuffer& ofSoundPlayerExtended::getCurrentSoundBuffer(int _size){
+    
+    if(currentSoundBuffer.getNumChannels()!= channels)
+        currentSoundBuffer.setNumChannels(channels);
+    
+    
+    for (int i=0; i<channels; i++){
+        channelSoundBuffer.copyFrom( getCurrentBufferForChannel(512, i), 1, samplerate);
+        currentSoundBuffer.setChannel(channelSoundBuffer, i);
+    }
+    
+    return currentSoundBuffer;
+
+}
 //-----------------------------------------------------------
 vector<float>& ofSoundPlayerExtended::getCurrentBufferForChannel(int _size, int channel){
     
@@ -860,7 +879,7 @@ vector<float>& ofSoundPlayerExtended::getCurrentBufferForChannel(int _size, int 
     }
    	currentBuffer.assign(currentBuffer.size(),0);
     
-    int nCh = channel - 1; //channels number starting from 0
+    int nCh = channel; //channels number starting from 0
     if (nCh >= channels){
         nCh = channels - 1;//limit to file nChannels
         ofLog(OF_LOG_WARNING,"ofSoundPlayerExtended: channel requested exceeds file channels");

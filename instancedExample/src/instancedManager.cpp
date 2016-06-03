@@ -23,6 +23,8 @@ void InstancedManager::setup(){
     
     velCounter = 1;
     
+    maskRadius = 0.0;
+    
     //material--
     material.setShininess( 100 );    // shininess is a value between 0 - 128, 128 being the most shiny //
     material.setSpecularColor(ofColor(255.f, 255.f, 255.f, 255.f));
@@ -102,6 +104,12 @@ void InstancedManager::draw(){
   
     ofPopStyle();
     
+// centered black circle
+    ofPushStyle();
+        ofSetColor(ofColor::black);
+        ofDrawCircle(xPos*Lim.x + Lim.x*.5, ofGetHeight()*(.5) + (yPos*Lim.y),0, maskRadius*_height);
+    ofPopStyle();
+    
    
 }
 
@@ -111,7 +119,12 @@ void InstancedManager::setCubeSize(float val){
     cubeSize = val;
     ofBoxPrimitive tmpBox;
     tmpBox.set(cubeSize);// set the size
-	vboMesh = tmpBox.getMesh();
+    
+    ofSpherePrimitive tmpSph;
+    tmpSph.set(cubeSize, 10);
+    
+//	vboMesh = tmpBox.getMesh();
+    vboMesh = tmpSph.getMesh();
 }
 //--------------------------------------
 void InstancedManager::setCubeSize(ofVec3f size){

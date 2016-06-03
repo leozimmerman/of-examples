@@ -82,7 +82,7 @@ void ofApp::update(){
     //    instanced.setCubeSize(ofVec3f(gCubesize->x * MAX_CUBESIZE,
     //                                  gCubesize->y * MAX_CUBESIZE,
     //                                  gCubesize->z * MAX_CUBESIZE));
-   
+    instanced.setMaskRadius(gMaskRadius);
     instanced.setHres(gHres * MAX_H_RES);
     instanced.setVres(gVres * MAX_V_RES);
     instanced.setVelocity(gVelocity * MAX_VELOCITY);

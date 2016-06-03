@@ -47,6 +47,7 @@ public:
     void setRadDeform(float val){radDeform = val;}
     void setOrientation(ofVec3f vec){Orient=vec;}
     void setQuilombo(bool b){bDoQuilombo=b;}
+    void setMaskRadius(float radius){maskRadius=radius;}
     void setColor(ofColor col){
         mainColor=col;
         material.setDiffuseColor(mainColor);
@@ -65,6 +66,8 @@ private:
     ofShader shaderInst;
     
     ofColor mainColor;
+    
+    float maskRadius;
     
     float _width, _height;
     int _hRes, _vRes;

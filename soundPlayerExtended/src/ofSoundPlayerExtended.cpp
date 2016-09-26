@@ -469,6 +469,14 @@ bool ofSoundPlayerExtended::load(string fileName, bool is_stream){
             alSourcei (sources[i], AL_SOURCE_RELATIVE, AL_TRUE);
         }
     }
+    //soundBuffer stuff---------------------
+    currentSoundBuffer.setNumChannels(channels);
+    currentSoundBuffer.setSampleRate(samplerate);
+    currentSoundBuffer.clear();
+    channelSoundBuffer.setNumChannels(1);
+    channelSoundBuffer.setSampleRate(samplerate);
+    channelSoundBuffer.clear();
+    //--------------------------------------
     ofLogVerbose("ofSoundPlayerExtended: successfully loaded " + fileName);
     bLoadedOk = true;
     return true;
@@ -856,21 +864,47 @@ vector<float>& ofSoundPlayerExtended::getCurrentBuffer(int _size)
 }
 
 //-----------------------------------------------------------
+//ofxAA
 ofSoundBuffer& ofSoundPlayerExtended::getCurrentSoundBuffer(int _size){
     
-    if(currentSoundBuffer.getNumChannels()!= channels)
-        currentSoundBuffer.setNumChannels(channels);
+    if(currentSoundBuffer.getNumChannels()!= channels){
+        ofLogError()<<"ofSoundPlayerExtended: currentSoundBuffer incorrect NumChannels";
+        return;
+    }
+    if(currentSoundBuffer.getSampleRate()!= samplerate){
+        ofLogError()<<"ofSoundPlayerExtended: currentSoundBuffer incorrect Sample Rate";
+        return;
+    }
+    if(channelSoundBuffer.getSampleRate()!= samplerate){
+        ofLogError()<<"ofSoundPlayerExtended: channelSoundBuffer incorrect Sample Rate";
+        return;
+    }
     
     
     for (int i=0; i<channels; i++){
-        channelSoundBuffer.copyFrom( getCurrentBufferForChannel(512, i), 1, samplerate);
+        channelSoundBuffer.copyFrom( getCurrentBufferForChannel(_size, i), 1, samplerate);
         currentSoundBuffer.setChannel(channelSoundBuffer, i);
     }
     
     return currentSoundBuffer;
-
+    
 }
 //-----------------------------------------------------------
+ofSoundBuffer&  ofSoundPlayerExtended::getCurrentSoundBufferMono(int _size){
+    
+    
+    if(channelSoundBuffer.getSampleRate()!= samplerate){
+        ofLogError()<<"ofSoundPlayerExtended: channelSoundBuffer incorrect Sample Rate";
+        return;
+    }
+    
+    channelSoundBuffer.copyFrom( getCurrentBuffer(_size), 1, samplerate);
+    
+    return channelSoundBuffer;
+    
+}
+//-----------------------------------------------------------
+//ofxAA
 vector<float>& ofSoundPlayerExtended::getCurrentBufferForChannel(int _size, int channel){
     
     if(int(currentBuffer.size()) != _size)
@@ -906,6 +940,90 @@ vector<float>& ofSoundPlayerExtended::getCurrentBufferForChannel(int _size, int 
         }
     }
     return currentBuffer;
+}
+//-----------------------------------------------------------
+ofSoundBuffer& ofSoundPlayerExtended::getSoundBufferForFrame(int _frame, float _fps, int _size){
+    
+    if(currentSoundBuffer.getNumChannels()!= channels){
+        ofLogError()<<"Sound Player: currentSoundBuffer incorrect NumChannels";
+        return;
+    }
+    if(currentSoundBuffer.getSampleRate()!= samplerate){
+        ofLogError()<<"Sound Player: currentSoundBuffer incorrect Sample Rate";
+        return;
+    }
+    if(channelSoundBuffer.getSampleRate()!= samplerate){
+        ofLogError()<<"Sound Player: channelSoundBuffer incorrect Sample Rate";
+        return;
+    }
+    
+    //---------------------------------------------
+    
+    for (int i=0; i<channels; i++){
+        channelSoundBuffer.copyFrom( getBufferForChannelForFrame(_frame, _fps, _size, i), 1, samplerate);
+        currentSoundBuffer.setChannel(channelSoundBuffer, i);
+    }
+    
+    return currentSoundBuffer;
+    
+    
+}
+//-----------------------------------------------------------
+ofSoundBuffer& ofSoundPlayerExtended::getSoundBufferMonoForFrame(int _frame, float _fps, int _size){
+    
+    if(channelSoundBuffer.getSampleRate()!= samplerate){
+        ofLogError()<<"Sound Player: channelSoundBuffer incorrect Sample Rate";
+        return;
+    }
+    
+    channelSoundBuffer.copyFrom( getBufferForFrame(_frame, _fps, _size), 1, samplerate);
+    
+    return channelSoundBuffer;
+    
+}
+// ----------------------------------------------------------------------------
+//ofxAA
+vector<float>& ofSoundPlayerExtended::getBufferForChannelForFrame(int _frame, float _fps, int _size, int channel){
+    
+    
+    if(int(currentBuffer.size()) != _size)
+    {
+        currentBuffer.resize(_size);
+    }
+   	currentBuffer.assign(currentBuffer.size(),0);
+    
+    //ok--------------------------------------
+    
+    int nCh= channel; //channels number starting from 0
+    if (nCh >= channels){
+        nCh = channels - 1;//limit to file nChannels
+        ofLog(OF_LOG_WARNING,"ofOpenALSoundPlayer_TimelineAdditions: channel requested exceeds file channels");
+    }
+    
+    //ok--------------------------------------
+    
+    int pos = _frame*float(samplerate)/_fps;
+    for(int k = 0; k < int(sources.size())/channels; ++k)
+    {
+        //for(int i = 0; i < channels; ++i) ///avoid channels sumup
+        int i = nCh; //use only specified channel
+        {
+            for(int j = 0; j < _size; ++j)
+            {
+                if(pos+j<(int)buffer.size())
+                {
+                    currentBuffer[j] += float(buffer[(pos+j)*channels+i])/65534.0f;
+                }
+                else
+                {
+                    currentBuffer[j] = 0;
+                }
+            }
+        }
+    }
+    return currentBuffer;
+    
+    
 }
 
 //-----------------------------------------------------------

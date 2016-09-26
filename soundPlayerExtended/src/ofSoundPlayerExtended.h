@@ -68,9 +68,17 @@ public:
     vector<short> & getBuffer();
     vector<float>& getCurrentBuffer(int _size);
     vector<float>& getBufferForFrame(int _frame, float _fps, int _size);
-    vector<float>& getCurrentBufferForChannel(int _size, int channel);
+    vector<float>& getCurrentBufferForChannel(int _size, int channel);//ofxAA
+    vector<float>& getBufferForChannelForFrame(int _frame, float _fps, int _size, int channel);//ofxAA
     vector<float> currentBuffer;
+    
+    //ofxAA:
     ofSoundBuffer& getCurrentSoundBuffer(int _size);
+    ofSoundBuffer& getCurrentSoundBufferMono(int _size);
+    
+    ofSoundBuffer& getSoundBufferForFrame(int _frame, float _fps, int _size);
+    ofSoundBuffer& getSoundBufferMonoForFrame(int _frame, float _fps, int _size);
+    
     ofSoundBuffer currentSoundBuffer;
     ofSoundBuffer channelSoundBuffer;
     
